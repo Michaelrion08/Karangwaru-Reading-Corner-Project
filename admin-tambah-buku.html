@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tambah Buku - Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="img/logo.svg" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+    <a class="back-link" href="admin.html">&larr; Kembali ke Dashboard Admin</a>
+    <div class="card-white" style="max-width:520px; margin:16px auto 0;">
+      <h2 style="text-align:center;">Tambah Buku Baru</h2>
+
+      <div class="form-group">
+        <label>Kode Buku (kosongkan jika ingin otomatis)</label>
+        <input id="kodeBuku" placeholder="Contoh: BK011">
+      </div>
+      <div class="form-group">
+        <label>Judul Buku</label>
+        <input id="judul" placeholder="Judul buku">
+      </div>
+      <div class="form-group">
+        <label>Pengarang</label>
+        <input id="pengarang" placeholder="Nama pengarang">
+      </div>
+      <div class="form-group">
+        <label>Penerbit</label>
+        <input id="penerbit" placeholder="Nama penerbit">
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select id="kategori">
+          <option>Fiksi Anak</option>
+          <option>Sains</option>
+          <option>Remaja</option>
+          <option>Gaya Hidup</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sinopsis</label>
+        <input id="sinopsis" placeholder="Ringkasan cerita singkat">
+      </div>
+      <div class="form-group">
+        <label>Link Gambar Sampul (Google Drive - link "Anyone with the link")</label>
+        <input id="linkGambar" placeholder="https://drive.google.com/uc?export=view&id=...">
+      </div>
+
+      <button class="btn" onclick="tambahBuku()">Tambah Buku</button>
+      <p class="form-msg" id="msg"></p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+if (!getAdminSession()) location.href = "admin-login.html";
+
+function tambahBuku() {
+  const kodeBuku = document.getElementById("kodeBuku").value.trim();
+  const judul = document.getElementById("judul").value.trim();
+  const pengarang = document.getElementById("pengarang").value.trim();
+  const penerbit = document.getElementById("penerbit").value.trim();
+  const kategori = document.getElementById("kategori").value;
+  const sinopsis = document.getElementById("sinopsis").value.trim();
+  const linkGambar = document.getElementById("linkGambar").value.trim();
+  const msg = document.getElementById("msg");
+
+  if (!judul || !pengarang || !penerbit) {
+    msg.textContent = "Judul, pengarang, dan penerbit wajib diisi";
+    msg.className = "form-msg error";
+    return;
+  }
+
+  callAPI("adminAddBook", { kodeBuku, judul, pengarang, penerbit, kategori, sinopsis, linkGambar }).then(r => {
+    if (!r.ok) { msg.textContent = r.message; msg.className = "form-msg error"; return; }
+    msg.textContent = `Buku berhasil ditambahkan dengan kode ${r.kodeBuku}`;
+    msg.className = "form-msg success";
+    document.getElementById("kodeBuku").value = "";
+    document.getElementById("judul").value = "";
+    document.getElementById("pengarang").value = "";
+    document.getElementById("penerbit").value = "";
+    document.getElementById("sinopsis").value = "";
+    document.getElementById("linkGambar").value = "";
+  });
+}
+</script>
+</body>
+</html>

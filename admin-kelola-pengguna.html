@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Pengguna - Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="img/logo.svg" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+    <a class="back-link" href="admin.html">&larr; Kembali ke Dashboard Admin</a>
+    <h2 style="margin-top:12px;">Kelola Pengguna</h2>
+
+    <div class="search-bar" style="margin-left:0;">
+      🔍<input id="searchInput" placeholder="Cari nama atau ID anggota..." oninput="renderTable()">
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>Nama</th><th>RT</th><th>HP Anak</th><th>HP Ortu</th><th>Tgl Daftar</th><th>Aksi</th></tr></thead>
+        <tbody id="tableBody"><tr><td colspan="7">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+if (!getAdminSession()) location.href = "admin-login.html";
+
+let members = [];
+
+function muatData() {
+  callAPI("adminGetMembers").then(r => {
+    if (!r.ok) return;
+    members = r.data;
+    renderTable();
+  });
+}
+
+function renderTable() {
+  const term = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = members.filter(m =>
+    (m.Nama || "").toLowerCase().includes(term) || (m.ID || "").toLowerCase().includes(term)
+  );
+  const body = document.getElementById("tableBody");
+  body.innerHTML = filtered.length ? filtered.map(m => `
+    <tr>
+      <td>${m.ID}</td>
+      <td>${m.Nama}</td>
+      <td>${m.RT}</td>
+      <td>${m.HP_Anak}</td>
+      <td>${m.HP_Ortu}</td>
+      <td>${m.TglDaftar ? new Date(m.TglDaftar).toLocaleDateString('id-ID') : '-'}</td>
+      <td style="display:flex; gap:6px;">
+        <button class="btn-sm info" onclick="resetPass('${m.ID}')">Reset Pass</button>
+        <button class="btn-sm danger" onclick="hapus('${m.ID}', '${m.Nama}')">Hapus</button>
+      </td>
+    </tr>`).join("") : `<tr><td colspan="7">Tidak ada anggota ditemukan.</td></tr>`;
+}
+
+function resetPass(id) {
+  const passwordBaru = prompt("Masukkan password baru untuk anggota ini:");
+  if (!passwordBaru) return;
+  callAPI("adminResetPassword", { idAnggota: id, passwordBaru }).then(r => alert(r.message));
+}
+
+function hapus(id, nama) {
+  if (!confirm(`Yakin ingin menghapus anggota "${nama}" (${id})? Tindakan ini tidak bisa dibatalkan.`)) return;
+  callAPI("adminDeleteMember", { idAnggota: id }).then(r => {
+    alert(r.message);
+    if (r.ok) muatData();
+  });
+}
+
+muatData();
+</script>
+</body>
+</html>

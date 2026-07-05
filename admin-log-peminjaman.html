@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Peminjaman - Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="img/logo.svg" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+    <a class="back-link" href="admin.html">&larr; Kembali ke Dashboard Admin</a>
+    <h2 style="margin-top:12px;">Log Peminjaman</h2>
+
+    <div class="tab-row">
+      <button id="tabAktif" class="active" onclick="showTab('aktif')">Sedang Dipinjam</button>
+      <button id="tabHistory" onclick="showTab('history')">Riwayat Selesai</button>
+    </div>
+
+    <div id="aktifPanel" class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>ID Pinjam</th><th>ID Anggota</th><th>Kode Buku</th><th>Tgl Pinjam</th><th>Jatuh Tempo</th><th>Aksi</th></tr></thead>
+        <tbody id="aktifBody"><tr><td colspan="6">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="historyPanel" class="admin-table-wrap" style="display:none;">
+      <table class="admin-table">
+        <thead><tr><th>ID Pinjam</th><th>ID Anggota</th><th>Kode Buku</th><th>Tgl Pinjam</th><th>Tgl Kembali</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="5">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+if (!getAdminSession()) location.href = "admin-login.html";
+
+function showTab(tab) {
+  document.getElementById("aktifPanel").style.display = tab === "aktif" ? "block" : "none";
+  document.getElementById("historyPanel").style.display = tab === "history" ? "block" : "none";
+  document.getElementById("tabAktif").classList.toggle("active", tab === "aktif");
+  document.getElementById("tabHistory").classList.toggle("active", tab === "history");
+}
+
+function fmtTgl(d) {
+  return d ? new Date(d).toLocaleDateString("id-ID") : "-";
+}
+
+function muatData() {
+  callAPI("adminGetLoanLog").then(r => {
+    if (!r.ok) return;
+
+    document.getElementById("aktifBody").innerHTML = r.aktif.length ? r.aktif.map(p => `
+      <tr>
+        <td>${p.IDPinjam}</td>
+        <td>${p.IDAnggota}</td>
+        <td>${p.KodeBuku}</td>
+        <td>${fmtTgl(p.TglPinjam)}</td>
+        <td>${fmtTgl(p.TglJatuhTempo)}</td>
+        <td><button class="btn-sm ok" onclick="kembalikan('${p.IDPinjam}')">Tandai Kembali</button></td>
+      </tr>`).join("") : `<tr><td colspan="6">Belum ada peminjaman aktif.</td></tr>`;
+
+    document.getElementById("historyBody").innerHTML = r.history.length ? r.history.map(h => `
+      <tr>
+        <td>${h.IDPinjam}</td>
+        <td>${h.IDAnggota}</td>
+        <td>${h.KodeBuku}</td>
+        <td>${fmtTgl(h.TglPinjam)}</td>
+        <td>${fmtTgl(h.TglKembali)}</td>
+      </tr>`).join("") : `<tr><td colspan="5">Belum ada riwayat.</td></tr>`;
+  });
+}
+
+function kembalikan(idPinjam) {
+  if (!confirm("Tandai buku ini sudah dikembalikan?")) return;
+  callAPI("adminReturnBook", { idPinjam }).then(r => {
+    alert(r.message);
+    if (r.ok) muatData();
+  });
+}
+
+muatData();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cetak QR - Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="img/logo.svg" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+    <a class="back-link no-print" href="admin.html">&larr; Kembali ke Dashboard Admin</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 20px;" class="no-print">
+      <h2 style="margin:0;">Cetak QR Code Buku</h2>
+      <button class="btn" style="width:auto; padding:10px 20px;" onclick="window.print()">🖨️ Cetak Semua</button>
+    </div>
+    <p class="no-print" style="font-size:0.85rem; opacity:0.85;">
+      Tempel setiap QR Code ini di sampul buku yang sesuai. Peminjaman akan otomatis mengenali kode buku saat di-scan.
+    </p>
+    <div class="qr-grid" id="qrGrid">Memuat katalog...</div>
+  </div>
+</section>
+
+<footer class="site-footer no-print">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+if (!getAdminSession()) location.href = "admin-login.html";
+
+callAPI("getCatalog").then(r => {
+  const grid = document.getElementById("qrGrid");
+  if (!r.ok || !r.data.length) { grid.innerHTML = "<p>Belum ada buku di katalog.</p>"; return; }
+  grid.innerHTML = r.data.map(b => `
+    <div class="qr-card">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(b.KodeBuku)}" alt="QR ${b.KodeBuku}">
+      <div class="qr-title">${b.Judul}</div>
+      <div class="qr-code">${b.KodeBuku}</div>
+    </div>
+  `).join("");
+});
+</script>
+</body>
+</html>
