@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="card-white center-card-wrap" style="max-width:440px;">
+    <h2 style="text-align:center;">Daftar Akun Baru</h2>
+
+    <div class="form-group">
+      <label>Nama Lengkap</label>
+      <input id="nama" placeholder="Nama lengkap">
+    </div>
+    <div class="form-group">
+      <label>RT</label>
+      <input id="rt" placeholder="Contoh: 54">
+    </div>
+    <div class="form-group">
+      <label>Nomor HP Kamu (Pribadi)</label>
+      <input id="hpAnak" placeholder="08xxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Nomor HP Orang Tua</label>
+      <input id="hpOrtu" placeholder="08xxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Buat Password (yang mudah diingat)</label>
+      <input id="password" type="password" placeholder="Contoh: nama tanggal lahir">
+    </div>
+
+    <button class="btn" onclick="daftar()">Daftar</button>
+    <p class="form-msg" id="msg"></p>
+    <p style="text-align:center; font-size:0.88rem; margin-top:10px;">
+      Sudah punya akun? <a href="login.html">Masuk di sini</a>
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+function daftar() {
+  const nama = document.getElementById("nama").value.trim();
+  const rt = document.getElementById("rt").value.trim();
+  const hpAnak = document.getElementById("hpAnak").value.trim();
+  const hpOrtu = document.getElementById("hpOrtu").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  if (!nama || !rt || !hpAnak || !hpOrtu || !password) {
+    msg.textContent = "Semua data wajib diisi";
+    msg.className = "form-msg error";
+    return;
+  }
+
+  callAPI("register", { nama, rt, hpAnak, hpOrtu, password }).then(r => {
+    if (!r.ok) { msg.textContent = r.message; msg.className = "form-msg error"; return; }
+    msg.textContent = "Pendaftaran berhasil! Mengarahkan ke login...";
+    msg.className = "form-msg success";
+    setTimeout(() => location.href = "login.html", 1200);
+  });
+}
+</script>
+</body>
+</html>

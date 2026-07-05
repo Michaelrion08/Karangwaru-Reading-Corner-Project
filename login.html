@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="card-white center-card-wrap">
+    <h2 style="text-align:center;">Masuk</h2>
+    <div class="form-group">
+      <label>Nomor HP Kamu</label>
+      <input id="hpAnak" placeholder="08xxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Password">
+    </div>
+    <button class="btn" onclick="login()">Masuk</button>
+    <p class="form-msg" id="msg"></p>
+    <p style="text-align:center; font-size:0.88rem; margin-top:10px;">
+      Belum punya akun? <a href="daftar.html">Daftar di sini</a>
+    </p>
+    <p style="text-align:center; font-size:0.85rem;">
+      Lupa password? Hubungi admin di halaman <a href="tentang.html">Tentang</a>.
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+function login() {
+  const hpAnak = document.getElementById("hpAnak").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+  if (!hpAnak || !password) { msg.textContent = "Isi nomor HP dan password"; msg.className = "form-msg error"; return; }
+  callAPI("login", { hpAnak, password }).then(r => {
+    if (!r.ok) { msg.textContent = r.message; msg.className = "form-msg error"; return; }
+    setSession(r.profile);
+    msg.textContent = "Berhasil masuk!";
+    msg.className = "form-msg success";
+    setTimeout(() => location.href = "profil.html", 700);
+  });
+}
+</script>
+</body>
+</html>

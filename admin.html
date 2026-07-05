@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Admin - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="card-white" style="max-width:420px; margin:0 auto; text-align:center;">
+    <div class="profile-avatar"><img src="https://api.iconify.design/twemoji:otter.svg" alt="Avatar"></div>
+    <div class="profile-name" id="adminName"></div>
+    <div class="profile-id" id="adminId"></div>
+
+    <ul class="menu-list" style="text-align:left; margin-top:16px;">
+      <li><a href="admin-tambah-buku.html">📗 Tambah Buku</a></li>
+      <li><a href="admin-log-peminjaman.html">📄 Log Peminjaman</a></li>
+      <li><a href="admin-cetak-qr.html">🏷️ Cetak QR</a></li>
+      <li><a href="admin-kelola-pengguna.html">👥 Kelola Pengguna</a></li>
+    </ul>
+
+    <button class="btn secondary" style="margin-top:14px;" onclick="keluarAdmin()">Keluar</button>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+const admin = getAdminSession();
+if (!admin) {
+  location.href = "admin-login.html";
+} else {
+  document.getElementById("adminName").textContent = admin.nama;
+  document.getElementById("adminId").textContent = `ID : ${admin.id} · RT 54 Karangwaru`;
+}
+function keluarAdmin() {
+  clearAdminSession();
+  location.href = "index.html";
+}
+</script>
+</body>
+</html>

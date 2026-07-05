@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tentang - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+    <div class="card-white" style="text-align:center; margin-bottom:20px;">
+      <h2>Tentang Pojok Baca Karangwaru</h2>
+      <p>Pojok Baca Karangwaru RW04 adalah program literasi untuk anak-anak di lingkungan Karangwaru,
+      Yogyakarta, yang bertujuan menumbuhkan minat baca sejak dini melalui akses buku yang mudah dan menyenangkan.
+      Program ini dijalankan bersama mahasiswa KKN dalam rangka pengabdian masyarakat.</p>
+    </div>
+
+    <div class="card-white" style="text-align:center;">
+      <h3>Kerja Sama Dengan</h3>
+      <div style="display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin-top:16px;">
+        <div>
+          <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO_USD" alt="Universitas Sanata Dharma" style="height:80px;">
+          <p>Universitas Sanata Dharma</p>
+        </div>
+        <div>
+          <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO_KKN" alt="KKN RW04" style="height:80px;">
+          <p>KKN RW04</p>
+        </div>
+        <div>
+          <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO_RW04" alt="RW04 Karangwaru" style="height:80px;">
+          <p>RW04 Karangwaru</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-white" style="text-align:center; margin-top:20px;">
+      <h3>Butuh Bantuan?</h3>
+      <p>Hubungi admin kami jika ada kendala peminjaman, lupa password, atau lainnya.</p>
+      <div id="adminContacts">Memuat kontak admin...</div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+  // Daftar nomor admin - isi manual di sini setelah posisi admin terisi
+  const ADMIN_CONTACTS = [
+    // { nama: "Kak Budi", nomor: "6281234567890" }
+  ];
+  const el = document.getElementById("adminContacts");
+  if (ADMIN_CONTACTS.length === 0) {
+    el.innerHTML = "<i>Nomor admin belum tersedia</i>";
+  } else {
+    el.innerHTML = ADMIN_CONTACTS.map(a =>
+      `<a class="btn" style="max-width:260px;margin:6px auto;display:block;" target="_blank"
+         href="https://wa.me/${a.nomor}">Hubungi ${a.nama}</a>`
+    ).join("");
+  }
+</script>
+</body>
+</html>

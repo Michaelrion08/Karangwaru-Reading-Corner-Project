@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalog - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="section-inner">
+
+    <div class="search-bar">
+      🔍<input id="searchInput" placeholder="Cari judul atau pengarang...">
+    </div>
+
+    <div class="chip-row" id="chipRow">
+      <button class="chip selected" data-cat="Semua">Semua</button>
+      <button class="chip" data-cat="Fiksi Anak">Fiksi Anak</button>
+      <button class="chip" data-cat="Sains">Sains</button>
+      <button class="chip" data-cat="Remaja">Remaja</button>
+      <button class="chip" data-cat="Gaya Hidup">Gaya Hidup</button>
+    </div>
+
+    <div class="book-grid" id="bookGrid">
+      <p style="color:#fff;">Memuat katalog...</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<!-- MODAL DETAIL BUKU -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="close-btn" id="closeModal">✕</button>
+    <img class="cover" id="modalImg" src="" alt="">
+    <h2 id="modalTitle"></h2>
+    <p class="publisher" id="modalPublisher"></p>
+    <p class="synopsis" id="modalSynopsis"></p>
+    <p style="text-align:center;"><span class="badge" id="modalStatus"></span></p>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let allBooks = [];
+let selectedCat = "Semua";
+
+function renderBooks() {
+  const term = document.getElementById("searchInput").value.toLowerCase();
+  const grid = document.getElementById("bookGrid");
+  const filtered = allBooks.filter(b => {
+    const matchCat = selectedCat === "Semua" || b.Kategori === selectedCat;
+    const matchTerm = (b.Judul || "").toLowerCase().includes(term) || (b.Pengarang || "").toLowerCase().includes(term);
+    return matchCat && matchTerm;
+  });
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p style="color:#fff;">Tidak ada buku ditemukan.</p>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(b => `
+    <div class="book-card" onclick="openDetail('${b.KodeBuku}')">
+      <img src="${b.LinkGambar || ''}" onerror="this.style.background='#ddd'; this.src='';">
+      <div class="title">${b.Judul}</div>
+      <div class="author">${b.Pengarang}</div>
+      <span class="badge ${b.Status === 'Dipinjam' ? 'dipinjam' : 'ada'}">${b.Status === 'Dipinjam' ? 'Dipinjam' : 'Ada'}</span>
+    </div>
+  `).join("");
+}
+
+function openDetail(kode) {
+  callAPI("getBookDetail", { kodeBuku: kode }).then(r => {
+    if (!r.ok) return alert(r.message);
+    const b = r.data;
+    document.getElementById("modalImg").src = b.LinkGambar || "";
+    document.getElementById("modalTitle").textContent = b.Judul;
+    document.getElementById("modalPublisher").textContent = b.Penerbit;
+    document.getElementById("modalSynopsis").textContent = b.Sinopsis;
+    const st = document.getElementById("modalStatus");
+    st.textContent = b.Status === "Dipinjam" ? "Dipinjam" : "Ada";
+    st.className = "badge " + (b.Status === "Dipinjam" ? "dipinjam" : "ada");
+    document.getElementById("modalOverlay").classList.add("open");
+  });
+}
+
+document.getElementById("closeModal").onclick = () => document.getElementById("modalOverlay").classList.remove("open");
+document.getElementById("modalOverlay").onclick = (e) => { if (e.target.id === "modalOverlay") e.currentTarget.classList.remove("open"); };
+document.getElementById("searchInput").addEventListener("input", renderBooks);
+document.getElementById("chipRow").addEventListener("click", (e) => {
+  if (!e.target.classList.contains("chip")) return;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
+  e.target.classList.add("selected");
+  selectedCat = e.target.dataset.cat;
+  renderBooks();
+});
+
+callAPI("getCatalog").then(r => {
+  if (r.ok) { allBooks = r.data; renderBooks(); }
+});
+</script>
+</body>
+</html>

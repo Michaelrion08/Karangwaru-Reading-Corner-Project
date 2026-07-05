@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil - Karangwaru Reading Corner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=GANTI_ID_LOGO" alt="Logo">
+    KARANGWARU READING CORNER
+  </div>
+  <nav>
+    <a href="index.html">Beranda</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="katalog.html">Katalog</a>
+    <a href="peminjaman.html">Peminjaman</a>
+    <a href="profil.html">Profil</a>
+    <a href="panduan.html">Panduan</a>
+  </nav>
+</header>
+
+<section class="page-section">
+  <div class="card-white" style="max-width:420px; margin:0 auto;">
+
+    <!-- ===== TAMPILAN TAMU (belum login) ===== -->
+    <div id="guestView" style="display:none; text-align:center;">
+      <div class="profile-avatar" style="margin:0 auto 10px;">📷</div>
+      <div class="profile-name">PROFIL BELUM TERSEDIA</div>
+      <div class="profile-id">ID : - · RT 54 Karangwaru</div>
+
+      <ul class="menu-list" style="text-align:left; margin-top:16px;">
+        <li><a href="peminjaman.html">📚 Buku Sedang Dipinjam</a></li>
+        <li><a href="peminjaman.html">📋 Riwayat Membaca</a></li>
+        <li><a href="login.html">⚙️ Pengaturan Akun</a></li>
+      </ul>
+      <a class="btn" href="login.html" style="margin-top:14px;">Masuk/Daftar</a>
+      <p style="margin-top:14px; font-size:0.82rem;">
+        <a href="admin-login.html">Login sebagai Admin</a>
+      </p>
+    </div>
+
+    <!-- ===== TAMPILAN ANGGOTA (sudah login) ===== -->
+    <div id="memberView" style="display:none; text-align:center;">
+      <div class="profile-avatar"><img src="https://api.iconify.design/twemoji:otter.svg" alt="Avatar"></div>
+      <div class="profile-name" id="memberName"></div>
+      <div class="profile-id" id="memberId"></div>
+
+      <ul class="menu-list" style="text-align:left; margin-top:16px;">
+        <li><button class="link-btn" onclick="toggleSection('dipinjamSection')">📚 Buku Sedang Dipinjam</button></li>
+        <li><button class="link-btn" onclick="toggleSection('riwayatSection')">📋 Riwayat Membaca</button></li>
+        <li><a href="peminjaman.html">⚙️ Pengaturan Akun</a></li>
+      </ul>
+
+      <div id="dipinjamSection" style="display:none; text-align:left; margin-top:10px;"></div>
+      <div id="riwayatSection" style="display:none; text-align:left; margin-top:10px;"></div>
+
+      <button class="btn secondary" style="margin-top:14px;" onclick="keluar()">Keluar</button>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">© Copyright 2026 - Karangwaru RW04 - KKN Universitas Sanata Dharma</footer>
+
+<script src="config.js"></script>
+<script>
+const adminSession = getAdminSession();
+if (adminSession) { location.href = "admin.html"; }
+
+const session = getSession();
+
+if (!session) {
+  document.getElementById("guestView").style.display = "block";
+} else {
+  document.getElementById("memberView").style.display = "block";
+  document.getElementById("memberName").textContent = session.nama;
+  document.getElementById("memberId").textContent = `ID : ${session.id} · RT ${session.rt} Karangwaru`;
+  muatProfil();
+}
+
+function muatProfil() {
+  callAPI("getProfile", { idAnggota: session.id }).then(r => {
+    if (!r.ok) return;
+    const dp = document.getElementById("dipinjamSection");
+    const rw = document.getElementById("riwayatSection");
+
+    dp.innerHTML = r.sedangDipinjam.length
+      ? r.sedangDipinjam.map(p => `<div class="card-white" style="margin-bottom:8px; padding:10px;">
+          Kode: ${p.KodeBuku}<br><span style="font-size:0.8rem;">Jatuh tempo: ${new Date(p.TglJatuhTempo).toLocaleDateString('id-ID')}</span>
+        </div>`).join("")
+      : "<p style='font-size:0.85rem;'>Belum ada buku yang sedang dipinjam.</p>";
+
+    rw.innerHTML = r.riwayat.length
+      ? r.riwayat.map(h => `<div class="card-white" style="margin-bottom:8px; padding:10px;">
+          Kode: ${h.KodeBuku}<br><span style="font-size:0.8rem;">Dikembalikan: ${new Date(h.TglKembali).toLocaleDateString('id-ID')}</span>
+        </div>`).join("")
+      : "<p style='font-size:0.85rem;'>Belum ada riwayat peminjaman.</p>";
+  });
+}
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function keluar() {
+  clearSession();
+  location.href = "index.html";
+}
+</script>
+</body>
+</html>
